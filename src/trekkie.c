@@ -29,8 +29,20 @@ void update_battery_display(BatteryChargeState charge_state) {
   layer_mark_dirty(battery_status_layer);
 }
 
+void alert_bluetooth_disconnect(bool connected) {
+  if (connected) return;
+  
+  static const uint32_t segments[] = { 500, 300, 500, 300, 500 };
+  VibePattern pat = {
+    .durations = segments,
+    .num_segments = ARRAY_LENGTH(segments),
+  };
+  vibes_enqueue_custom_pattern(pat);
+}
+
 void update_bluetooth_status(bool connected) {
   layer_set_hidden(bitmap_layer_get_layer(bluetooth_status_layer), !connected);
+  alert_bluetooth_disconnect(connected);
 }
 
 void battery_status_layer_update(Layer* layer, GContext* ctx) {
